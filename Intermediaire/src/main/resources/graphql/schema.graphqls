@@ -1,0 +1,34 @@
+type Position{
+    ville: String!
+    rayon: Int!
+    centre: String!
+    tarif: Int!
+
+}
+
+type LocationRequest{
+    startLatitude: Float!
+    startLongitude: Float!
+    endLatitude: Float!
+    endLongitude: Float!
+    distance: Float!
+}
+
+type Query{
+    getAllPositions:[Position]
+    getPositionsByCentre(centre: String!): [Position]
+    getPositionByRayon(rayon: Int!): Position
+
+}
+
+type Mutation{
+      createPosition(ville: String!, rayon: Int!, centre: String!, tarif: Int!): Position
+       deletePosition(ville: String!): Boolean
+        calculateTarif(
+               startLatitude: Float!,
+               startLongitude: Float!,
+               endLatitude: Float!,
+               endLongitude: Float!,
+               distance: Float!
+           ): Float
+}

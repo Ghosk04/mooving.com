@@ -1,0 +1,320 @@
+scalar Date
+scalar DateTime
+
+type Query {
+    # Requêtes pour les conducteurs
+    driverById(id: ID!): Driver
+    driverByLicense(license: String!): Driver
+    driversByState(state: Int!): [Driver]
+    driversByResidence(residence: String!): [Driver]
+    driversByName(name: String!): [Driver]
+    availableDrivers(atTime: String!): [Driver]
+    allDrivers: [Driver]
+    # Requêtes pour les planifcations
+    allPlannings: [Planning]
+    allPlanningHistories : [PlanningHistory]
+    planningById(id: ID!): Planning
+    # Requêtes pour les voyages
+    allCities: [City]
+    cityByName(name: String!) : City
+    cityById(id: ID!) : City
+    quartersByCityId(id: ID!) : [String]
+    allTravels: [Travel]
+    allTravelHistories : [TravelHistory]
+    travelById(id: ID!): Travel
+    travelByState(state: TravelState!) : [Travel]
+    travelByPlanningId(id: ID!) : [Travel]
+    travelByDuration(start: Date, end: Date) : [Travel]
+    travelHistoryById(id: ID!) : TravelHistory
+    # Requêtes pour les véhicules
+    vehicleById(id: ID!) : Vehicle
+    vehicleByRegistrationNumber(registrationNumber: String!) : Vehicle
+    vehicleByState(state: VehicleState!)  : [Vehicle]
+    vehicleByCategory(categoryCode: String!) : [Vehicle]
+    allVehicles : [Vehicle]
+    vehicleByTime(atTime : DateTime!) : [Vehicle]
+    categoryById(code: String!) : Category
+    allCategories : [Category]
+    vehiclePhotoById(id: ID!) : VehiclePhoto
+    allVehiclePhotos : [VehiclePhoto]
+    vehiclePhotoByVehicleId(id: ID!) : VehiclePhoto
+}
+
+type Mutation {
+    # Requêtes pour les conducteurs
+    createDriver(driver: DriverInput!): Driver
+    updateDriver(id: ID!, driver: DriverInput!): Driver
+    deleteDriver(id: ID!): ID
+    createDriverPhoto(photo: DriverPhotoInput!): DriverPhoto
+    updateDriverPhoto(id: ID!, photo: DriverPhotoInput!): DriverPhoto
+    deleteDriverPhoto(id: ID!): Boolean
+    # Requêtes pour les planifications
+    createPlanning(input: PlanningInput!): Planning
+    publishPlanning(id: ID!) : Boolean
+    updatePlanning(id: ID!, input: PlanningInput!): Planning
+    deletePlanning(id: ID!): Boolean
+    addTravelToPlanning(idPlanning: ID!, idTravel: ID!) : Boolean
+    removeTravelFromPlanning(idPlanning: ID!, idTravel: ID!, date: DateTime): Boolean
+    # Requêtes pour les voyages
+    createCity(input: CityInput!): City
+    deleteCity(id: ID!) : Boolean
+    updateCity(id: ID!, input: CityInput) : City
+    createTravel(input: TravelInput!): Travel
+    updateTravel(id: ID!, input: TravelInput!): Travel
+    deleteTravel(id: ID!): Boolean
+    createTravelHistory(input: TravelInput) : TravelHistory
+    deleteTravelHistory(id: ID!) : Boolean
+    # Requêtes pour les véhicules
+    createVehicle(vehicle : VehicleInput!): Vehicle
+    deleteVehicle(id: ID!): Boolean
+    updateVehicle(id: ID!, vehicle: VehicleInput!): Vehicle
+    createCategory(category: CategoryInput!): Category
+    deleteCategory(code: String!) : Boolean
+    updateCategory(code: String!, category: CategoryInput!): Category
+    createVehiclePhoto(photo: VehiclePhotoInput!) : VehiclePhoto
+    deleteVehiclePhoto(id: ID!) : Boolean
+    updatePhoto(id: ID!, photo: VehiclePhotoInput!) : VehiclePhoto
+}
+
+input DriverPhotoInput {
+    id : ID!
+    driverID : ID!
+    url : String!
+    description : String!
+}
+
+type Driver {
+    id: ID!
+    state: DriverState!
+    name: String!
+    surname: String!
+    residence: String!
+    gearBox: GearBox!
+    license: String
+    hourlyVol: Int!
+    hourlySalary: Int!
+    elapsedWorkingTime: Int!
+    lastTravelDuration: Int!
+    lastTravelEndDateTime: DateTime
+    routeExperience: [RouteExperience]
+    vehicleCategoryExperience: [VehicleCategoryExperience]
+    photo: DriverPhoto
+}
+
+type DriverPhoto {
+    id: ID!
+    driverID: ID!
+    url: String!
+    description: String!
+    uploadDateTime: DateTime!
+}
+
+type RouteExperience {
+    route: String!
+    experience: Float!
+}
+
+type VehicleCategoryExperience {
+    category: String!
+    experience: Float!
+}
+type Vehicle {
+    id: ID!
+    state: VehicleState
+    capacity: Int
+    categoryCode: String
+    chassisNumber: String
+    registrationNumber: String
+    gearBox: GearBox
+    revisionTime: Int
+    revisionPrice: Int
+    consumptionPrice: Int
+    firstCirculation: String
+    lastTravelEndDateTime: String
+}
+
+type VehiclePhoto {
+    id: ID!
+    url: String
+    vehicleID: ID
+    description: String
+    uploadDateTime: String
+}
+
+type Category {
+    code: String!
+    name: String
+    description: String
+}
+
+type Planning {
+    id: ID!
+    name: String!
+    plannedTravels: [ID]
+    endDate: Date!
+    startDate: Date!
+    state: PlanningState!
+}
+
+type PlanningHistory {
+    id: ID!
+    name: String!
+    plannedTravels: [ID]
+    endDate: Date!
+    startDate: Date!
+    state: PlanningState!
+    creationDate: DateTime!
+}
+
+type City {
+    id: ID!
+    name: String!
+    quarters: [String]
+}
+
+type Travel {
+    id: ID!
+    agencyId: ID
+    itineraryId: ID
+    vehicleID: ID!
+    driverID: ID
+    state: TravelState!
+    departureCityId: ID!
+    departureQuarter: String!
+    destinationCityId: ID!
+    destinationQuarter: String!
+    duration: Int!
+    totalCost: Float!
+    startDate: DateTime!
+    tollPrice: Int!
+    ticketPrice: Int!
+    stopPoints: [ID]
+}
+
+type TravelHistory {
+    id: ID!
+    driverID: ID!
+    vehicleID: ID!
+    duration: Int!
+    departureCityId: ID!
+    destinationCityId: ID!
+    startDate: DateTime!
+    tollPrice: Int!
+    ticketPrice: Int!
+}
+
+input DriverInput {
+    state: DriverState
+    name: String
+    surname: String
+    residence: String
+    gearBox: GearBox
+    license: String
+    hourlyVol: Int
+    hourlySalary: Int
+    elapsedWorkingTime: Int
+    lastTravelDuration: Int
+    lastTravelEndDateTime: DateTime
+    routeExperience: [RouteExperienceInput]
+    vehicleCategoryExperience: [VehicleCategoryExperienceInput]
+}
+
+input RouteExperienceInput {
+    route: String!
+    experience: Float!
+}
+
+input VehicleCategoryExperienceInput {
+    category: String!
+    experience: Float!
+}
+
+input PlanningInput {
+    name: String!
+    plannedTravels: [ID]
+    endDate: Date!
+    startDate: Date!
+    state: PlanningState
+}
+
+input TravelInput {
+    agencyId: ID
+    itineraryId: ID
+    vehicleID: ID!
+    driverID: ID
+    state: TravelState
+    departureCityId: ID!
+    departureQuarter: String!
+    destinationCityId: ID!
+    destinationQuarter: String!
+    duration: Int!
+    totalCost: Float!
+    startDate: DateTime!
+    tollPrice: Int!
+    ticketPrice: Int!
+    stopPoints: [ID]
+}
+
+input CityInput {
+    id: ID
+    name: String!
+    quarters: [String]
+}
+
+input VehicleInput {
+    state: VehicleState
+    capacity: Int
+    categoryCode: String
+    chassisNumber: String
+    registrationNumber: String
+    gearBox: GearBox
+    revisionTime: Int
+    revisionPrice: Int
+    consumptionPrice: Int
+    firstCirculation: String
+    lastTravelEndDateTime: DateTime
+}
+
+input VehiclePhotoInput {
+    url: String
+    vehicleID: ID
+    description: String
+    uploadDateTime: DateTime
+}
+
+input CategoryInput {
+    code: String
+    name: String
+    description: String
+}
+
+enum GearBox {
+    MANUAL
+    AUTOMATIC
+    ALL
+}
+
+enum VehicleState {
+    ON_USE
+    ON_REVISION
+    READY
+}
+
+enum DriverState {
+    READY
+    ON_REST
+    TRAVELLING
+}
+
+enum TravelState {
+    PUBLISHED
+    NOT_PUBLISHED
+    ONGOING
+    CANCELLED
+    FINISHED
+}
+
+enum PlanningState {
+    PUBLISHED
+    NOT_PUBLISHED
+}

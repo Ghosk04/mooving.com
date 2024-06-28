@@ -1,0 +1,20 @@
+# Utiliser une image de base officielle OpenJDK
+FROM openjdk:17-jre-slim
+
+# Ajouter Maven pour construire le projet
+RUN apt-get update && apt-get install -y maven
+
+# Définir le répertoire de travail dans l'image Docker
+WORKDIR /app
+
+# Copier les fichiers du projet dans le conteneur
+COPY . .
+
+# Construire le projet Maven (qui génère le fichier JAR)
+RUN mvn clean package -DskipTests
+
+# Exposer le port sur lequel l'application écoute
+EXPOSE 8080
+
+# Lancer l'application
+ENTRYPOINT ["java", "-jar", "intermediaire.jar"]

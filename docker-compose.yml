@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8070:8070"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - planification
+      - tarif
+
+  microservice-planification:
+    build:
+      context: ./planification
+      dockerfile: Dockerfile
+    container_name: planification
+    ports:
+      - "8080:8070" #ports de service de planification
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:cassandra://<external_cassandra_host>:9042
+    networks:
+      - travel-planning-network
+
+  microservice-tarif:
+    build:
+      context: ./tarif
+      dockerfile: Dockerfile
+    container_name: tarif
+    ports:
+      - "8081:8070" #ports de service du tarif
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:cassandra://<external_cassandra_host>:9042
+    networks:
+      - travel-planning-network
+
+  pulsar:
+    image: apachepulsar/pulsar:latest
+    container_name: pulsar
+    command: bin/pulsar standalone
+    ports:
+      - "6650:6650"
+      - "8080:8080"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    environment:
+      - discovery.types=single-node
+    ports:
+      - "9200:9200"
+
+
+networks:
+  travel-planning-network:
+    driver: bridge
